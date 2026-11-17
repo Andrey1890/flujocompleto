@@ -131,6 +131,9 @@ PostgreSQL gratuita. El plan gratuito es temporal y puede caducar; úsalo solo
 para una prueba. El backend crea/aplica el esquema Prisma en la base Render al
 iniciarse, no en la base local. El panel se construye con la URL pública de la
 API y CORS se limita al host del frontend.
+La URL de CORS del Blueprint es `https://server2-productos-web.onrender.com`;
+si el host asignado al sitio estático difiere, actualiza `CORS_ORIGIN` en el
+servicio API desde el dashboard de Render.
 
 El workflow `.github/workflows/ci-cd.yml` valida el esquema, genera Prisma,
 construye el frontend, ejecuta la auditoría npm y escanea secretos. Para

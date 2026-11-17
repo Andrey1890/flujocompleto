@@ -19,10 +19,7 @@ services:
       - key: DB_IDLE_TIMEOUT
         value: "30000"
       - key: CORS_ORIGIN
-        fromService:
-          type: web
-          name: server2-productos-web
-          property: host
+        value: https://server2-productos-web.onrender.com
       - key: CORS_METHODS
         value: GET,POST,PUT,PATCH,DELETE
       - key: PAGINATION_LIMIT
