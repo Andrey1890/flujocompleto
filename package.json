@@ -8,7 +8,7 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "prisma:generate": "prisma generate",
-    "db:ensure-schema": "prisma db push --skip-generate",
+    "db:ensure-schema": "prisma db push",
     "db:migrate-products": "node scripts/migrate-products.js",
     "build:frontend": "node frontend-client/build.js"
   },

@@ -129,8 +129,9 @@ y `DB_IDLE_TIMEOUT`.
 `render.yaml` define la API y una base PostgreSQL gratuita. El plan gratuito de
 la base es temporal y puede caducar; úsalo solo para pruebas. El backend
 crea/aplica el esquema Prisma en la base Render al iniciarse, no en la base
-local. El frontend se publica en GitHub Pages desde GitHub Actions y la API
-permite su origen `https://andrey1890.github.io` mediante CORS.
+local, mediante `prisma db push`. El frontend se publica en GitHub Pages desde
+GitHub Actions y la API permite su origen `https://andrey1890.github.io`
+mediante CORS.
 
 El workflow `.github/workflows/ci-cd.yml` valida el esquema, genera Prisma,
 construye el frontend, ejecuta la auditoría npm y escanea secretos. En los
