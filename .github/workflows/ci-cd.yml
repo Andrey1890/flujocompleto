@@ -61,11 +61,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
-    name: Deploy API and frontend to Render
+    name: Deploy API to Render and frontend to GitHub Pages
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     needs: validate
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
       - name: Trigger API deploy
         env:
           DEPLOY_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
@@ -76,12 +86,28 @@ jobs:
           fi
           curl --fail --silent --show-error --request POST "$DEPLOY_HOOK"
 
-      - name: Trigger frontend deploy
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build frontend for GitHub Pages
         env:
-          DEPLOY_HOOK: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
-        run: |
-          if [ -z "$DEPLOY_HOOK" ]; then
-            echo "::notice::Frontend deploy skipped; configure RENDER_FRONTEND_DEPLOY_HOOK after creating the Render service."
-            exit 0
-          fi
-          curl --fail --silent --show-error --request POST "$DEPLOY_HOOK"
+          API_BASE_URL: https://server2-productos-api.onrender.com
+        run: npm run build:frontend
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload frontend artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: frontend-client/dist
+
+      - name: Deploy frontend
+        id: deployment
+        uses: actions/deploy-pages@v4

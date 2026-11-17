@@ -126,35 +126,33 @@ y `DB_IDLE_TIMEOUT`.
 
 ## Despliegue de prueba en Render
 
-`render.yaml` define tres recursos: la API, el panel estático y una base
-PostgreSQL gratuita. El plan gratuito es temporal y puede caducar; úsalo solo
-para una prueba. El backend crea/aplica el esquema Prisma en la base Render al
-iniciarse, no en la base local. El panel se construye con la URL pública de la
-API y CORS se limita al host del frontend.
-La URL de CORS del Blueprint es `https://server2-productos-web.onrender.com`;
-si el host asignado al sitio estático difiere, actualiza `CORS_ORIGIN` en el
-servicio API desde el dashboard de Render.
+`render.yaml` define la API y una base PostgreSQL gratuita. El plan gratuito de
+la base es temporal y puede caducar; úsalo solo para pruebas. El backend
+crea/aplica el esquema Prisma en la base Render al iniciarse, no en la base
+local. El frontend se publica en GitHub Pages desde GitHub Actions y la API
+permite su origen `https://andrey1890.github.io` mediante CORS.
 
 El workflow `.github/workflows/ci-cd.yml` valida el esquema, genera Prisma,
-construye el frontend, ejecuta la auditoría npm y escanea secretos. Para
-habilitar su despliegue desde `main` o `master`, conecta el repositorio a Render
-usando el Blueprint de `render.yaml`, crea un Deploy Hook para cada servicio y
-guárdalos en GitHub Actions como `RENDER_API_DEPLOY_HOOK` y
-`RENDER_FRONTEND_DEPLOY_HOOK`. Render genera `HASH_SECRET_SALT` y proporciona
-`DATABASE_URL`; no guardes ninguna de esas credenciales en el repositorio.
+construye el frontend, ejecuta la auditoría npm y escanea secretos. En los
+pushes validados a `main` o `master`, publica `frontend-client/dist` en GitHub
+Pages y, si está configurado `RENDER_API_DEPLOY_HOOK`, despliega la API en
+Render. Render genera `HASH_SECRET_SALT` y proporciona `DATABASE_URL`; no
+guardes esas credenciales en el repositorio.
 
-Pasos: sube estos cambios al repositorio GitHub; en Render crea un **Blueprint
-Instance** seleccionando ese repositorio y confirma los tres recursos
-PostgreSQL/API/frontend; espera a que el backend pase `/health`; copia cada
-Deploy Hook desde **Settings** de su servicio a los dos GitHub Actions secrets;
-después de que CI pase en `main` o `master`, el workflow dispara ambos
-despliegues. No se requiere ningún secreto ni servicio de Supabase. Si el repo
-usa `master`, selecciónalo como rama en el Blueprint al crearlo.
+Pasos: habilita **Settings → Pages → Source: GitHub Actions** si Pages no está
+configurado todavía; en Render crea un **Blueprint Instance** desde este repo
+y confirma la API y PostgreSQL; guarda el Deploy Hook de la API como el secreto
+`RENDER_API_DEPLOY_HOOK` en **Settings → Secrets and variables → Actions**. El
+workflow tiene los permisos `pages: write` e `id-token: write` para publicar
+Pages. No se requiere ningún secreto ni servicio de Supabase. Si la rama
+principal del repo es `master`, selecciónala también en el Blueprint.
 
-El primer push puede ocurrir antes de crear los servicios y configurar los
-Deploy Hooks; en ese caso el workflow omite CD con un aviso y CI sigue pasando.
-Después de guardar ambos secretos, el siguiente push validado a la rama
-principal dispara los despliegues.
+La URL esperada del frontend es
+`https://andrey1890.github.io/flujocompleto/`. El frontend usa la API pública
+`https://server2-productos-api.onrender.com/api/v1/productos`; asegúrate de que
+el servicio API tenga ese hostname en Render y actualiza `API_BASE_URL` en el
+workflow si Render asigna uno diferente. En Render, verifica también que
+`CORS_ORIGIN` coincida con el origen real de Pages.
 
 ### Migrar los productos existentes
 

@@ -19,7 +19,7 @@ services:
       - key: DB_IDLE_TIMEOUT
         value: "30000"
       - key: CORS_ORIGIN
-        value: https://server2-productos-web.onrender.com
+        value: https://andrey1890.github.io
       - key: CORS_METHODS
         value: GET,POST,PUT,PATCH,DELETE
       - key: PAGINATION_LIMIT
@@ -28,19 +28,6 @@ services:
         generateValue: true
       - key: API_PREFIX
         value: /api/v1
-
-  - type: web
-    name: server2-productos-web
-    runtime: static
-    buildCommand: npm run build:frontend
-    staticPublishPath: ./frontend-client/dist
-    autoDeploy: false
-    envVars:
-      - key: API_BASE_URL
-        fromService:
-          type: web
-          name: server2-productos-api
-          property: host
 
 databases:
   - name: server2-productos-db
