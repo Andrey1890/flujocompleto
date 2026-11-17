@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Producto {
+  idProducto   String   @id @map("idproducto") @db.Char(11)
+  proNombre    String?  @map("pronombre") @db.VarChar(35)
+  proCategoria String?  @map("procategoria") @db.VarChar(12)
+  proPvp       Decimal? @map("propvp") @db.Decimal(7, 2)
+
+  @@map("productos")
+}

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f6fb">
+    <title>Panel de pruebas | API Productos</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="config.js"></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Panel API Productos, inicio">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span>Panel <strong>Productos</strong></span>
+      </a>
+      <div class="connection">
+        <span class="connection-dot" aria-hidden="true"></span>
+        <span>API configurada</span>
+        <code id="api-url"></code>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">HERRAMIENTA DE DESARROLLO</p>
+          <h1>Prueba tu API de productos</h1>
+          <p class="intro-copy">Consulta y administra el catálogo directamente desde tu API REST.</p>
+        </div>
+        <div class="intro-badge"><span aria-hidden="true">↗</span> API REST · JSON</div>
+      </section>
+
+      <div class="workspace">
+        <aside class="actions-column">
+          <section class="card search-card">
+            <div class="section-heading">
+              <span class="icon-box icon-search" aria-hidden="true">⌕</span>
+              <div><h2>Buscar producto</h2><p>Consulta un producto por su ID</p></div>
+            </div>
+            <form id="search-form" class="inline-form">
+              <label class="sr-only" for="search-id">ID del producto</label>
+              <input id="search-id" name="idProducto" maxlength="11" placeholder="Ej. AB123456789" required>
+              <button class="button button-dark" type="submit">Buscar <span aria-hidden="true">→</span></button>
+            </form>
+          </section>
+
+          <section class="card form-card">
+            <div class="section-heading">
+              <span class="icon-box icon-create" aria-hidden="true">＋</span>
+              <div><h2 id="editor-title">Crear producto</h2><p id="editor-description">Agrega un producto al catálogo</p></div>
+            </div>
+            <form id="product-form" class="product-form">
+              <input type="hidden" name="mode" value="create">
+              <label for="product-id">ID del producto <span class="label-note">hasta 11 caracteres</span></label>
+              <input id="product-id" name="idProducto" maxlength="11" placeholder="Ej. AB123456789" required>
+
+              <label for="product-name">Nombre</label>
+              <input id="product-name" name="proNombre" maxlength="35" placeholder="Nombre del producto" required>
+
+              <label for="product-category">Categoría</label>
+              <input id="product-category" name="proCategoria" maxlength="12" placeholder="Ej. General" required>
+
+              <label for="product-price">Precio</label>
+              <div class="price-input">
+                <span aria-hidden="true">$</span>
+                <input id="product-price" name="proPvp" type="number" min="0.01" max="99999.99" step="0.01" placeholder="0.00" required>
+              </div>
+
+              <div class="form-actions">
+                <button id="submit-product" class="button button-primary" type="submit">Crear producto <span aria-hidden="true">→</span></button>
+                <button id="cancel-edit" class="button button-quiet" type="button" hidden>Cancelar</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="card patch-card">
+            <div class="section-heading">
+              <span class="icon-box icon-patch" aria-hidden="true">✎</span>
+              <div><h2>Edición rápida</h2><p>Modifica un campo con PATCH</p></div>
+            </div>
+            <form id="patch-form" class="product-form compact-form">
+              <label for="patch-id">ID del producto</label>
+              <input id="patch-id" name="idProducto" maxlength="11" placeholder="Ej. AB123456789" required>
+              <label for="patch-field">Campo a modificar</label>
+              <select id="patch-field" name="field">
+                <option value="proPvp">Precio</option>
+                <option value="proNombre">Nombre</option>
+                <option value="proCategoria">Categoría</option>
+              </select>
+              <label id="patch-value-label" for="patch-value">Nuevo precio</label>
+              <input id="patch-value" name="value" type="number" min="0.01" max="99999.99" step="0.01" required>
+              <button class="button button-outline" type="submit">Actualizar campo <span aria-hidden="true">→</span></button>
+            </form>
+          </section>
+        </aside>
+
+        <section class="results-column">
+          <section class="card catalog-card">
+            <div class="catalog-header">
+              <div class="section-heading">
+                <span class="icon-box icon-catalog" aria-hidden="true">▤</span>
+                <div><h2>Catálogo de productos</h2><p id="catalog-summary">Carga la lista para comenzar</p></div>
+              </div>
+              <button id="refresh-button" class="button button-light" type="button"><span aria-hidden="true">↻</span> Actualizar</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>ID</th><th>Nombre</th><th>Categoría</th><th class="align-right">Precio</th><th class="align-right">Acciones</th></tr>
+                </thead>
+                <tbody id="products-body">
+                  <tr><td class="empty-state" colspan="5"><span class="empty-icon" aria-hidden="true">▤</span><strong>Tu catálogo aparecerá aquí</strong><span>Usa “Actualizar” para cargar los productos.</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination">
+              <span id="page-summary">Página 1</span>
+              <div class="pagination-buttons">
+                <button id="previous-page" class="button button-page" type="button" disabled><span aria-hidden="true">←</span> Anterior</button>
+                <button id="next-page" class="button button-page" type="button">Siguiente <span aria-hidden="true">→</span></button>
+              </div>
+            </div>
+          </section>
+
+          <section class="card response-card">
+            <div class="response-header">
+              <div class="section-heading">
+                <span class="icon-box icon-response" aria-hidden="true">&lt;/&gt;</span>
+                <div><h2>Respuesta HTTP</h2><p>Solicitud y respuesta más recientes</p></div>
+              </div>
+              <span id="response-status" class="status-badge status-idle">Listo</span>
+            </div>
+            <pre id="response-output" aria-live="polite"><code>Envía una solicitud para ver aquí la respuesta de la API.</code></pre>
+          </section>
+        </section>
+      </div>
+      <p class="schema-note">Este panel usa el esquema actual de la API: ID, nombre, categoría y precio.</p>
+    </main>
+  </body>
+</html>

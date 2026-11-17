@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: server2-productos-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run prisma:generate
+    startCommand: npm run db:ensure-schema && npm start
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: server2-productos-db
+          property: connectionString
+      - key: DB_MAX_POOL
+        value: "5"
+      - key: DB_IDLE_TIMEOUT
+        value: "30000"
+      - key: CORS_ORIGIN
+        fromService:
+          type: web
+          name: server2-productos-web
+          property: host
+      - key: CORS_METHODS
+        value: GET,POST,PUT,PATCH,DELETE
+      - key: PAGINATION_LIMIT
+        value: "1000"
+      - key: HASH_SECRET_SALT
+        generateValue: true
+      - key: API_PREFIX
+        value: /api/v1
+
+  - type: web
+    name: server2-productos-web
+    runtime: static
+    buildCommand: npm run build:frontend
+    staticPublishPath: ./frontend-client/dist
+    autoDeploy: false
+    envVars:
+      - key: API_BASE_URL
+        fromService:
+          type: web
+          name: server2-productos-api
+          property: host
+
+databases:
+  - name: server2-productos-db
+    databaseName: bddproductos
+    user: server2
+    plan: free

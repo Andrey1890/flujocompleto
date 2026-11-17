@@ -1,0 +1,5 @@
+node_modules/
+generated/prisma/
+.env
+npm-debug.log*
+frontend-client/dist/

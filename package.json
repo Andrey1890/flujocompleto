@@ -1,0 +1,30 @@
+{
+  "name": "server2-product-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "REST API for the existing BDDProductos PostgreSQL database",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "prisma:generate": "prisma generate",
+    "db:ensure-schema": "prisma db push --skip-generate",
+    "db:migrate-products": "node scripts/migrate-products.js",
+    "build:frontend": "node frontend-client/build.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "prisma": "^7.10.1"
+  }
+}
